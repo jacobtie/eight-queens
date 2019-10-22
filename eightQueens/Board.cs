@@ -5,20 +5,19 @@ namespace hill_climbing_eight_queens
 {
     public sealed class Board
     {
-        private Node[,] gameBoard;
+        public QueenPosition[] queens;
         private const int BOARD_SIZE = 8;
         public bool GoalState { get; set; }
 
         public Board()
         {
-            gameBoard = new Node[BOARD_SIZE, BOARD_SIZE];
+            queens = new QueenPosition[BOARD_SIZE];
+
             for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    gameBoard[i,j] = new Node();
-                }
+                queens[i] = new QueenPosition();
             }
+
             GoalState = false;
         }
 
@@ -27,22 +26,35 @@ namespace hill_climbing_eight_queens
             return BOARD_SIZE;
         }
 
-        public Node this[int i, int j]
+        public QueenPosition this[int i]
         {
-            get => gameBoard[i,j];
+            get => queens[i];
         }
 
         public string GetBoardAsString()
         {
             StringBuilder sb = new StringBuilder();
+            Boolean isQueen;
 
             sb.AppendLine();
             for (int i = 0; i < BOARD_SIZE; i++)
             {
                 for (int j = 0; j < BOARD_SIZE; j++)
                 {
-                    sb.Append(gameBoard[j,i].HasQueen ? "   1" : "   0");
+                    isQueen = false;
+
+                    for (int k = 0; k < BOARD_SIZE; k++)
+                    {
+                        if (queens[k].X == i && queens[k].Y == j)
+                        {
+                            isQueen = true;
+                            break;
+                        }
+                    }
+
+                    sb.Append(isQueen ? " 1" : " 0");
                 }
+
                 sb.AppendLine();
             }
 
@@ -58,22 +70,8 @@ namespace hill_climbing_eight_queens
 
             for (int i = 0; i < BOARD_SIZE; i++)
             {
-                var retry = false;
-                do
-                {
-                    var xPos = rand.Next(8);
-                    var yPos = rand.Next(8);
-
-                    if (newBoard[xPos, yPos].HasQueen)
-                    {
-                        retry = true;
-                    }
-                    else
-                    {
-                        newBoard[xPos, yPos].HasQueen = true;
-                        retry = false;
-                    }
-                } while (retry);
+                var col = rand.Next(8);
+                newBoard.queens[i] = new QueenPosition(i, col);
             }
 
             return newBoard;
@@ -85,10 +83,8 @@ namespace hill_climbing_eight_queens
 
             for (int i = 0; i < BOARD_SIZE; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    newBoard[i,j].HasQueen = currentState[i,j].HasQueen;
-                }
+                newBoard[i].X = currentState[i].X;
+                newBoard[i].Y = currentState[i].Y;
             }
 
             return newBoard;
