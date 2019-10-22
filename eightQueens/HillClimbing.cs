@@ -55,7 +55,7 @@ namespace hill_climbing_eight_queens
             var startingHeuristic = GetHeuristicFromBoard(startingState);
             var intermediateBoards = new List<Board>{startingState};
             var currentState = startingState;
-            var minHeuristic = startingHeuristic;
+            Random rand = new Random();
 
             if (startingHeuristic == 0)
             {
@@ -63,21 +63,35 @@ namespace hill_climbing_eight_queens
                 return intermediateBoards;
             }
 
+            var prevState = new Board();
+
             while (true)
             {
                 Board neighbor = null;
                 var queenPositions = currentState.queens;
                 var nextHeuristic = int.MaxValue;
                 var successors = GenerateNeighbors(currentState);
+                var equalBoards = new List<Board>();
+                var currHeuristic = GetHeuristicFromBoard(currentState);
 
                 foreach (var successor in successors)
                 {
+                    if (successor.Equals(prevState))
+                    {
+                        continue;
+                    }
+
                     var foundHeuristic = GetHeuristicFromBoard(successor);
 
                     if (foundHeuristic < nextHeuristic)
                     {
                         nextHeuristic = foundHeuristic;
                         neighbor = successor;
+                    }
+
+                    if (foundHeuristic == currHeuristic)
+                    {
+                        equalBoards.Add(successor);
                     }
                 }
 
@@ -90,15 +104,20 @@ namespace hill_climbing_eight_queens
                 }
 
                 // Make sure the heuristic actually is lower
-                if (nextHeuristic >= minHeuristic)
+                if (nextHeuristic > currHeuristic)
                 {
                     return intermediateBoards;
                 }
+                else if (nextHeuristic == currHeuristic)
+                {
+                    neighbor = equalBoards[rand.Next(equalBoards.Count)];
+                    Console.WriteLine("Moved Sideways! ");
+                }
 
                 // Loop
+                prevState = currentState;
                 currentState = neighbor;
                 intermediateBoards.Add(currentState);
-                minHeuristic = nextHeuristic;
             }
 
             return intermediateBoards;

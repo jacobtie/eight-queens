@@ -3,7 +3,7 @@ using System.Text;
 
 namespace hill_climbing_eight_queens
 {
-    public sealed class Board
+    public sealed class Board : IEquatable<Board>
     {
         public QueenPosition[] queens;
         private const int BOARD_SIZE = 8;
@@ -88,6 +88,20 @@ namespace hill_climbing_eight_queens
             }
 
             return newBoard;
+        }
+
+        // override object.Equals
+        public bool Equals(Board other)
+        {
+            for (int i = 0; i < queens.Length; i++)
+            {
+                if (queens[i].Y != other.queens[i].Y)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
