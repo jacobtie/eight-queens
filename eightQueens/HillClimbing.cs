@@ -1,13 +1,101 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace hill_climbing_eight_queens
 {
     public static class HillClimbing
     {
+        public static void RunHillClimbing(bool doesRestart, bool movesSideways, int boardSize)
+        {
+            var retry = false;
+            var restarts = 0;
+
+            do
+            {
+                var gameBoard = Board.BuildRandomBoard(boardSize);
+
+                var boards = ClimbHill(gameBoard, movesSideways);
+
+                Console.WriteLine("\nStarting Board Configuration: ");
+                Console.WriteLine($"Heuristic: {HillClimbing.GetHeuristicFromBoard(boards[0])}");
+                Console.Write(boards[0].GetBoardAsString());
+
+                for (int i = 0; i < (boardSize * 2) + 5 || i < 21; i++)
+                {
+                    Console.Write("-");
+                }
+
+                Console.WriteLine("\n");
+
+                for (int i = 1; i < boards.Count; i++)
+                {
+                    int currH = HillClimbing.GetHeuristicFromBoard(boards[i]);
+
+                    Console.WriteLine($"Board Configuration {i+1}");
+                    Console.WriteLine($"Heuristic: {currH}");
+
+                    if (currH == HillClimbing.GetHeuristicFromBoard(boards[i-1]))
+                    {
+                        Console.WriteLine("Moved Sideways. ");
+                    }
+
+                    Console.Write(boards[i].GetBoardAsString());
+
+                    for (int k = 0; k < (boardSize * 2) + 5 || k < 21; k++)
+                    {
+                        Console.Write("-");
+                    }
+
+                    Console.WriteLine("\n");
+                }
+
+                if (boards.Last().GoalState)
+                {
+                    retry = false;
+
+                    Console.WriteLine($"Success! This iteration took {boards.Count-1} moves. ");
+
+                    if (doesRestart)
+                    {
+                        Console.Write($"Restarted {restarts} time");
+
+                        if (restarts != 1)
+                        {
+                            Console.WriteLine("s.");
+                        }
+                        else
+                        {
+                            Console.WriteLine(".");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    retry = true;
+                    restarts++;
+                    Console.WriteLine($"Failed. This iteration took {boards.Count-1} moves");
+
+                    if (doesRestart)
+                    {
+                        Console.WriteLine("Restarting now.");
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                    }
+                }
+            } 
+            while (retry && doesRestart);
+        }
+
         public static int GetHeuristicFromBoard(Board gameBoard)
         {
-            var boardSize = Board.BoardSize();
+            var boardSize = gameBoard.BoardSize();
             int heuristic = 0;
 
             for (int i = 0; i < boardSize; i++)
@@ -20,7 +108,8 @@ namespace hill_climbing_eight_queens
                         heuristic++;
                     }
 
-                    if (Math.Abs(gameBoard[i].X - gameBoard[k].X) == Math.Abs(gameBoard[i].Y - gameBoard[k].Y))
+                    if (Math.Abs(gameBoard[i].X - gameBoard[k].X) == 
+                        Math.Abs(gameBoard[i].Y - gameBoard[k].Y))
                     {
                         heuristic++;
                     }
@@ -36,7 +125,7 @@ namespace hill_climbing_eight_queens
             
             for (int i = 0; i < currentState.queens.Length; i++)
             {
-                for (int j = 0; j < Board.BoardSize(); j++)
+                for (int j = 0; j < currentState.BoardSize(); j++)
                 {
                     if (currentState.queens[i].Y != j)
                     {
@@ -50,7 +139,7 @@ namespace hill_climbing_eight_queens
             return successors;
         }
 
-        public static List<Board> ClimbHill(Board startingState)
+        public static List<Board> ClimbHill(Board startingState, bool movesSideways)
         {
             var startingHeuristic = GetHeuristicFromBoard(startingState);
             var intermediateBoards = new List<Board>{startingState};
@@ -63,11 +152,11 @@ namespace hill_climbing_eight_queens
                 return intermediateBoards;
             }
 
-            var prevState = new Board();
+            var prevState = new Board(startingState.BoardSize());
 
             while (true)
             {
-                Board neighbor = null;
+                Board nextState = null;
                 var queenPositions = currentState.queens;
                 var nextHeuristic = int.MaxValue;
                 var successors = GenerateNeighbors(currentState);
@@ -86,7 +175,7 @@ namespace hill_climbing_eight_queens
                     if (foundHeuristic < nextHeuristic)
                     {
                         nextHeuristic = foundHeuristic;
-                        neighbor = successor;
+                        nextState = successor;
                     }
 
                     if (foundHeuristic == currHeuristic)
@@ -98,25 +187,27 @@ namespace hill_climbing_eight_queens
                 // Check if heuristic is 0
                 if (nextHeuristic == 0)
                 {
-                    neighbor.GoalState = true;
-                    intermediateBoards.Add(neighbor);
+                    nextState.GoalState = true;
+                    intermediateBoards.Add(nextState);
                     break;
                 }
 
                 // Make sure the heuristic actually is lower
-                if (nextHeuristic > currHeuristic)
+                if (nextHeuristic >= currHeuristic)
                 {
-                    return intermediateBoards;
-                }
-                else if (nextHeuristic == currHeuristic)
-                {
-                    neighbor = equalBoards[rand.Next(equalBoards.Count)];
-                    Console.WriteLine("Moved Sideways! ");
+                    if (nextHeuristic == currHeuristic && movesSideways)
+                    {
+                        nextState = equalBoards[rand.Next(equalBoards.Count)];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 // Loop
                 prevState = currentState;
-                currentState = neighbor;
+                currentState = nextState;
                 intermediateBoards.Add(currentState);
             }
 

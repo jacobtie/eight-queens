@@ -6,14 +6,15 @@ namespace hill_climbing_eight_queens
     public sealed class Board : IEquatable<Board>
     {
         public QueenPosition[] queens;
-        private const int BOARD_SIZE = 8;
+        private int boardSize;
         public bool GoalState { get; set; }
 
-        public Board()
+        public Board(int size)
         {
-            queens = new QueenPosition[BOARD_SIZE];
+            boardSize = size;
+            queens = new QueenPosition[boardSize];
 
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < boardSize; i++)
             {
                 queens[i] = new QueenPosition();
             }
@@ -21,9 +22,9 @@ namespace hill_climbing_eight_queens
             GoalState = false;
         }
 
-        public static int BoardSize()
+        public int BoardSize()
         {
-            return BOARD_SIZE;
+            return boardSize;
         }
 
         public QueenPosition this[int i]
@@ -37,13 +38,13 @@ namespace hill_climbing_eight_queens
             Boolean isQueen;
 
             sb.AppendLine();
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < boardSize; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (int j = 0; j < boardSize; j++)
                 {
                     isQueen = false;
 
-                    for (int k = 0; k < BOARD_SIZE; k++)
+                    for (int k = 0; k < boardSize; k++)
                     {
                         if (queens[k].X == i && queens[k].Y == j)
                         {
@@ -63,14 +64,14 @@ namespace hill_climbing_eight_queens
             return sb.ToString();
         }
 
-        public static Board BuildRandomBoard()
+        public static Board BuildRandomBoard(int size)
         {
-            var newBoard = new Board();
+            var newBoard = new Board(size);
             var rand = new Random();
 
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < size; i++)
             {
-                var col = rand.Next(8);
+                var col = rand.Next(size);
                 newBoard.queens[i] = new QueenPosition(i, col);
             }
 
@@ -79,9 +80,9 @@ namespace hill_climbing_eight_queens
 
         public static Board CloneFromBoard(Board currentState)
         {
-            var newBoard = new Board();
+            var newBoard = new Board(currentState.BoardSize());
 
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < newBoard.BoardSize(); i++)
             {
                 newBoard[i].X = currentState[i].X;
                 newBoard[i].Y = currentState[i].Y;
