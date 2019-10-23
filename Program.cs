@@ -21,7 +21,7 @@ namespace hill_climbing_eight_queens
 
                 if (testMode)
                 {
-
+                    RunTest();
                 }
                 else
                 {
@@ -58,11 +58,7 @@ namespace hill_climbing_eight_queens
 
             testMode = (input == 'Y');
 
-            if (testMode)
-            {
-                RunTest();
-            }
-            else
+            if (!testMode)
             {
                 do
                 {
