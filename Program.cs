@@ -12,7 +12,6 @@ namespace hill_climbing_eight_queens
 
         static void Main(string[] args)
         {
-            bool replay;
             char input;
 
             do
@@ -34,10 +33,8 @@ namespace hill_climbing_eight_queens
                     input = Console.ReadLine().ToUpper()[0];
                 }
                 while(input != 'Y' && input != 'N');
-
-                replay = (input == 'Y');
             }
-            while(replay);
+            while(input == 'Y');
 
             Console.WriteLine("\nPress any key to exit...");
             Console.ReadKey();
