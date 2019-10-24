@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>hill_climbing_eight_queens</RootNamespace>
   </PropertyGroup>
-
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="12.1.2"/>
+  </ItemGroup>
 </Project>
