@@ -21,6 +21,7 @@ namespace hill_climbing_eight_queens
                 NumSteps = 0,
                 Succeeded = false,
             };
+
             var retry = false;
             var restarts = 0;
 
@@ -36,7 +37,6 @@ namespace hill_climbing_eight_queens
                     Logger.WriteLine($"Heuristic: {HillClimbing.GetHeuristicFromBoard(boards[0])}");
                     Logger.Write(boards[0].GetBoardAsString());
                 
-
                     for (int i = 0; i < (boardSize * 2) + 5 || i < 21; i++)
                     {
                         Logger.Write("-");
@@ -44,7 +44,6 @@ namespace hill_climbing_eight_queens
 
                     Logger.WriteLine("\n");
                 
-
                     for (int i = 1; i < boards.Count; i++)
                     {
                         int currH = HillClimbing.GetHeuristicFromBoard(boards[i]);
@@ -76,6 +75,7 @@ namespace hill_climbing_eight_queens
                     {
                         Logger.WriteLine($"Success! This iteration took {boards.Count-1} moves. ");
                     }
+
                     result.Succeeded = true;
                     result.NumSteps = boards.Count - 1;
 
@@ -85,6 +85,7 @@ namespace hill_climbing_eight_queens
                         {
                             Logger.Write($"Restarted {restarts} time");
                         }
+
                         result.NumRestarts = restarts;
 
                         if (logOutput)
@@ -108,6 +109,7 @@ namespace hill_climbing_eight_queens
                 {
                     retry = true;
                     restarts++;
+
                     if (logOutput)
                     {
                         Logger.WriteLine($"Failed. This iteration took {boards.Count-1} moves");
@@ -124,6 +126,7 @@ namespace hill_climbing_eight_queens
                     {
                         result.Succeeded = false;
                         result.NumSteps = boards.Count - 1;
+                        
                         if (logOutput)
                         {
                             Logger.WriteLine();

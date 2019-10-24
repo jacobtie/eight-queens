@@ -46,43 +46,65 @@ namespace hill_climbing_eight_queens
 
         static void GetUserInput()
         {
-            char input;
+            string allInput;
+            char input = '?';
 
             Logger.WriteLine("\nWelcome to the N-Queens Problem Solver. ");
 
             do
             {
                 Logger.WriteLine("\nWould you like to run the tests for the program? (Y/N)");
-                input = Console.ReadLine().ToUpper()[0];
-                Logger.WriteLine(input, false);
+                allInput = Console.ReadLine();
+
+                if (allInput.Length > 0)
+                {
+                    input = allInput.ToUpper()[0];
+                    Logger.WriteLine(input, false);
+                }
             }
             while(input != 'Y' && input != 'N');
 
             testMode = (input == 'Y');
+            input = '?';
 
             if (!testMode)
             {
                 do
                 {
-                    Logger.WriteLine("\nWhat would you like the size of the board to be?");
+                    Logger.WriteLine("\nWhat would you like the size of the board to be? (Must be positive)");
+                    int.TryParse(Console.ReadLine(), out boardSize);
                 }
-                while(!int.TryParse(Console.ReadLine(), out boardSize));
+                while(boardSize <= 0);
+
                 Logger.WriteLine(boardSize, false);
 
                 do
                 {
                     Logger.WriteLine("\nWould you like the board to restart if a solution could not be found? (Y/N)");
-                    input = Console.ReadLine().ToUpper()[0];
+                    allInput = Console.ReadLine();
+
+                    if (allInput.Length > 0)
+                    {
+                        input = allInput.ToUpper()[0];
+                    }
+
                     Logger.WriteLine(input, false);
                 }
                 while(input != 'Y' && input != 'N');
 
                 doesRestart = (input == 'Y');
+                input = '?';
 
                 do
                 {
                     Logger.WriteLine("\nWould you like the program to explore equal states? (Y/N)");
-                    input = Console.ReadLine().ToUpper()[0];
+                    allInput = Console.ReadLine();
+
+                    if (allInput.Length > 0)
+                    {
+                        input = allInput.ToUpper()[0];
+                    }
+
                     Logger.WriteLine(input, false);
                 }
                 while(input != 'Y' && input != 'N');
