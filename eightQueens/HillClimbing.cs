@@ -1,89 +1,117 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace hill_climbing_eight_queens
 {
     public static class HillClimbing
     {
+        public static void RunHillClimbing(bool doesRestart, bool movesSideways, int boardSize)
+        {
+            var retry = false;
+            var restarts = 0;
+
+            do
+            {
+                var gameBoard = Board.BuildRandomBoard(boardSize);
+
+                var boards = ClimbHill(gameBoard, movesSideways);
+
+                Console.WriteLine("\nStarting Board Configuration: ");
+                Console.WriteLine($"Heuristic: {HillClimbing.GetHeuristicFromBoard(boards[0])}");
+                Console.Write(boards[0].GetBoardAsString());
+
+                for (int i = 0; i < (boardSize * 2) + 5 || i < 21; i++)
+                {
+                    Console.Write("-");
+                }
+
+                Console.WriteLine("\n");
+
+                for (int i = 1; i < boards.Count; i++)
+                {
+                    int currH = HillClimbing.GetHeuristicFromBoard(boards[i]);
+
+                    Console.WriteLine($"Board Configuration {i+1}");
+                    Console.WriteLine($"Heuristic: {currH}");
+
+                    if (currH == HillClimbing.GetHeuristicFromBoard(boards[i-1]))
+                    {
+                        Console.WriteLine("Moved Sideways. ");
+                    }
+
+                    Console.Write(boards[i].GetBoardAsString());
+
+                    for (int k = 0; k < (boardSize * 2) + 5 || k < 21; k++)
+                    {
+                        Console.Write("-");
+                    }
+
+                    Console.WriteLine("\n");
+                }
+
+                if (boards.Last().GoalState)
+                {
+                    retry = false;
+
+                    Console.WriteLine($"Success! This iteration took {boards.Count-1} moves. ");
+
+                    if (doesRestart)
+                    {
+                        Console.Write($"Restarted {restarts} time");
+
+                        if (restarts != 1)
+                        {
+                            Console.WriteLine("s.");
+                        }
+                        else
+                        {
+                            Console.WriteLine(".");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    retry = true;
+                    restarts++;
+                    Console.WriteLine($"Failed. This iteration took {boards.Count-1} moves");
+
+                    if (doesRestart)
+                    {
+                        Console.WriteLine("Restarting now.");
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                    }
+                }
+            } 
+            while (retry && doesRestart);
+        }
+
         public static int GetHeuristicFromBoard(Board gameBoard)
         {
-            var visited = new List<Node>();
-            var boardSize = Board.BoardSize();
+            var boardSize = gameBoard.BoardSize();
             int heuristic = 0;
 
             for (int i = 0; i < boardSize; i++)
             {
-                for (int j = 0; j < boardSize; j++)
+                // Check for queens left and right / up and down using same iterator
+                for (int k = i + 1; k < boardSize; k++)
                 {
-                    var current = gameBoard[i,j];
-                    if (current.HasQueen)
+                    if (gameBoard[i].Y == gameBoard[k].Y)
                     {
-                        visited.Add(current);
-                        // Check for queens left and right / up and down using same iterator
-                        for (int k = 0; k < boardSize; k++)
-                        {
-                            if (gameBoard[i,k].HasQueen && !visited.Contains(gameBoard[i,k]))
-                            {
-                                heuristic++;
-                            }
+                        heuristic++;
+                    }
 
-                            if (gameBoard[k,j].HasQueen && !visited.Contains(gameBoard[k,j]))
-                            {
-                                heuristic++;
-                            }
-                        }
-
-                        // Check for queens upper left
-                        int upperLeftX = i - 1;
-                        int upperLeftY = j - 1;
-                        while (upperLeftX >= 0 && upperLeftY >= 0)
-                        {
-                            if (gameBoard[upperLeftX, upperLeftY].HasQueen && !visited.Contains(gameBoard[upperLeftX, upperLeftY]))
-                            {
-                                heuristic++;
-                            }
-                            upperLeftX--;
-                            upperLeftY--;
-                        }
-
-                        // Check for queens upper right
-                        int upperRightX = i - 1;
-                        int upperRightY = j + 1;
-                        while (upperRightX >= 0 && upperRightY < boardSize)
-                        {
-                            if (gameBoard[upperRightX, upperRightY].HasQueen && !visited.Contains(gameBoard[upperRightX, upperRightY]))
-                            {
-                                heuristic++;
-                            }
-                            upperRightX--;
-                            upperRightY++;
-                        }
-
-                        // Check for queens bottom left
-                        int bottomLeftX = i + 1;
-                        int bottomLeftY = j - 1;
-                        while (bottomLeftX < boardSize && bottomLeftY >= 0)
-                        {
-                            if (gameBoard[bottomLeftX, bottomLeftY].HasQueen && !visited.Contains(gameBoard[bottomLeftX, bottomLeftY]))
-                            {
-                                heuristic++;
-                            }
-                            bottomLeftX++;
-                            bottomLeftY--;
-                        }
-
-                        // Check for queens bottom right
-                        int bottomRightX = i + 1;
-                        int bottomRightY = j + 1;
-                        while (bottomRightX < boardSize && bottomRightY < boardSize)
-                        {
-                            if (gameBoard[bottomRightX, bottomRightY].HasQueen && !visited.Contains(gameBoard[bottomRightX, bottomRightY]))
-                            {
-                                heuristic++;
-                            }
-                            bottomRightX++;
-                            bottomRightY++;
-                        }
+                    if (Math.Abs(gameBoard[i].X - gameBoard[k].X) == 
+                        Math.Abs(gameBoard[i].Y - gameBoard[k].Y))
+                    {
+                        heuristic++;
                     }
                 }
             }
@@ -91,36 +119,32 @@ namespace hill_climbing_eight_queens
             return heuristic;
         }
 
-        public static List<Board> GenerateBoardsFromQueen(Board currentState, int currentQueenX, int currentQueenY)
+        public static List<Board> GenerateNeighbors(Board currentState)
         {
-            Board baseBoard = Board.CloneFromBoard(currentState);
-            // Remove the queen from the base board
-            baseBoard[currentQueenX, currentQueenY].HasQueen = false;
             var successors = new List<Board>();
             
-            for (int i = 0; i < Board.BoardSize(); i++)
+            for (int i = 0; i < currentState.queens.Length; i++)
             {
-                for (int j = 0; j < Board.BoardSize(); j++)
+                for (int j = 0; j < currentState.BoardSize(); j++)
                 {
-                    if (!currentState[i,j].HasQueen)
+                    if (currentState.queens[i].Y != j)
                     {
-                        var newBoard = Board.CloneFromBoard(baseBoard);
-                        newBoard[i,j].HasQueen = true;
+                        var newBoard = Board.CloneFromBoard(currentState);
+                        newBoard.queens[i].Y = j;
                         successors.Add(newBoard);
                     }
-                
                 }
             }
 
             return successors;
         }
 
-        public static List<Board> ClimbHill(Board startingState)
+        public static List<Board> ClimbHill(Board startingState, bool movesSideways)
         {
             var startingHeuristic = GetHeuristicFromBoard(startingState);
             var intermediateBoards = new List<Board>{startingState};
             var currentState = startingState;
-            var minHeuristic = startingHeuristic;
+            Random rand = new Random();
 
             if (startingHeuristic == 0)
             {
@@ -128,57 +152,63 @@ namespace hill_climbing_eight_queens
                 return intermediateBoards;
             }
 
+            var prevState = new Board(startingState.BoardSize());
 
             while (true)
             {
-                Board neighbor = null;
-                var queenPositions = new List<QueenPosition>();
-                // This is inefficient, but I am in a hurry
-                for (int i = 0; i < Board.BoardSize(); i++)
-                {
-                    for (int j = 0; j < Board.BoardSize(); j++)
-                    {
-                        if (currentState[i,j].HasQueen)
-                        {
-                            queenPositions.Add(new QueenPosition(i, j));
-                        }
-                    }
-                }
-
-                // Find the neighbor with the lowest heuristic
+                Board nextState = null;
+                var queenPositions = currentState.queens;
                 var nextHeuristic = int.MaxValue;
-                foreach (var queen in queenPositions)
+                var successors = GenerateNeighbors(currentState);
+                var equalBoards = new List<Board>();
+                var currHeuristic = GetHeuristicFromBoard(currentState);
+
+                foreach (var successor in successors)
                 {
-                    var successors = GenerateBoardsFromQueen(currentState, queen.X, queen.Y);
-                    foreach (var successor in successors)
+                    if (successor.Equals(prevState))
                     {
-                        var foundHeuristic = GetHeuristicFromBoard(successor);
-                        if (foundHeuristic < nextHeuristic)
-                        {
-                            nextHeuristic = foundHeuristic;
-                            neighbor = successor;
-                        }
+                        continue;
+                    }
+
+                    var foundHeuristic = GetHeuristicFromBoard(successor);
+
+                    if (foundHeuristic < nextHeuristic)
+                    {
+                        nextHeuristic = foundHeuristic;
+                        nextState = successor;
+                    }
+
+                    if (foundHeuristic == currHeuristic)
+                    {
+                        equalBoards.Add(successor);
                     }
                 }
 
                 // Check if heuristic is 0
                 if (nextHeuristic == 0)
                 {
-                    neighbor.GoalState = true;
-                    intermediateBoards.Add(neighbor);
+                    nextState.GoalState = true;
+                    intermediateBoards.Add(nextState);
                     break;
                 }
 
                 // Make sure the heuristic actually is lower
-                if (nextHeuristic >= minHeuristic)
+                if (nextHeuristic >= currHeuristic)
                 {
-                    return intermediateBoards;
+                    if (nextHeuristic == currHeuristic && movesSideways)
+                    {
+                        nextState = equalBoards[rand.Next(equalBoards.Count)];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 // Loop
-                currentState = neighbor;
+                prevState = currentState;
+                currentState = nextState;
                 intermediateBoards.Add(currentState);
-                minHeuristic = nextHeuristic;
             }
 
             return intermediateBoards;

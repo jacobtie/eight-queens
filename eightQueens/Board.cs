@@ -3,46 +3,59 @@ using System.Text;
 
 namespace hill_climbing_eight_queens
 {
-    public sealed class Board
+    public sealed class Board : IEquatable<Board>
     {
-        private Node[,] gameBoard;
-        private const int BOARD_SIZE = 8;
+        public QueenPosition[] queens;
+        private int boardSize;
         public bool GoalState { get; set; }
 
-        public Board()
+        public Board(int size)
         {
-            gameBoard = new Node[BOARD_SIZE, BOARD_SIZE];
-            for (int i = 0; i < BOARD_SIZE; i++)
+            boardSize = size;
+            queens = new QueenPosition[boardSize];
+
+            for (int i = 0; i < boardSize; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    gameBoard[i,j] = new Node();
-                }
+                queens[i] = new QueenPosition();
             }
+
             GoalState = false;
         }
 
-        public static int BoardSize()
+        public int BoardSize()
         {
-            return BOARD_SIZE;
+            return boardSize;
         }
 
-        public Node this[int i, int j]
+        public QueenPosition this[int i]
         {
-            get => gameBoard[i,j];
+            get => queens[i];
         }
 
         public string GetBoardAsString()
         {
             StringBuilder sb = new StringBuilder();
+            Boolean isQueen;
 
             sb.AppendLine();
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < boardSize; i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (int j = 0; j < boardSize; j++)
                 {
-                    sb.Append(gameBoard[j,i].HasQueen ? "   1" : "   0");
+                    isQueen = false;
+
+                    for (int k = 0; k < boardSize; k++)
+                    {
+                        if (queens[k].X == i && queens[k].Y == j)
+                        {
+                            isQueen = true;
+                            break;
+                        }
+                    }
+
+                    sb.Append(isQueen ? " 1" : " 0");
                 }
+
                 sb.AppendLine();
             }
 
@@ -51,29 +64,15 @@ namespace hill_climbing_eight_queens
             return sb.ToString();
         }
 
-        public static Board BuildRandomBoard()
+        public static Board BuildRandomBoard(int size)
         {
-            var newBoard = new Board();
+            var newBoard = new Board(size);
             var rand = new Random();
 
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < size; i++)
             {
-                var retry = false;
-                do
-                {
-                    var xPos = rand.Next(8);
-                    var yPos = rand.Next(8);
-
-                    if (newBoard[xPos, yPos].HasQueen)
-                    {
-                        retry = true;
-                    }
-                    else
-                    {
-                        newBoard[xPos, yPos].HasQueen = true;
-                        retry = false;
-                    }
-                } while (retry);
+                var col = rand.Next(size);
+                newBoard.queens[i] = new QueenPosition(i, col);
             }
 
             return newBoard;
@@ -81,17 +80,29 @@ namespace hill_climbing_eight_queens
 
         public static Board CloneFromBoard(Board currentState)
         {
-            var newBoard = new Board();
+            var newBoard = new Board(currentState.BoardSize());
 
-            for (int i = 0; i < BOARD_SIZE; i++)
+            for (int i = 0; i < newBoard.BoardSize(); i++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
-                {
-                    newBoard[i,j].HasQueen = currentState[i,j].HasQueen;
-                }
+                newBoard[i].X = currentState[i].X;
+                newBoard[i].Y = currentState[i].Y;
             }
 
             return newBoard;
+        }
+
+        // override object.Equals
+        public bool Equals(Board other)
+        {
+            for (int i = 0; i < queens.Length; i++)
+            {
+                if (queens[i].Y != other.queens[i].Y)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

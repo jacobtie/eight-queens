@@ -5,6 +5,8 @@ namespace hill_climbing_eight_queens
         public int X { get; set; }
         public int Y { get; set; }
 
+        public QueenPosition(){}
+
         public QueenPosition(int x, int y)
         {
             X = x;
