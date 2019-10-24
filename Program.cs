@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using CsvHelper;
 
 namespace hill_climbing_eight_queens
 {
@@ -91,7 +93,41 @@ namespace hill_climbing_eight_queens
 
         static void RunTest()
         {
-            // Needs the big implement
+            Logger.WriteLine("Running tests....this might take a while...");
+
+            var results = new List<HillClimbingResult>();
+
+            Logger.WriteLine("Recording default Hill Climbing with 8 Queens statistics...");
+            for (int i = 0; i < 500; i++)
+            {
+                results.Add(HillClimbing.RunHillClimbing(false, false, 8, false));
+            }
+
+            Logger.WriteLine("Recording sideways moves Hill Climbing with 8 Queens statistics...");
+            for (int i = 0; i < 500; i++)
+            {
+                results.Add(HillClimbing.RunHillClimbing(false, true, 8, false));
+            }
+
+            Logger.WriteLine("Recording random restart without sideways moves Hill Climbing with 8 Queens statistics...");
+            for (int i = 0; i < 500; i++)
+            {
+                results.Add(HillClimbing.RunHillClimbing(true, false, 8, false));
+            }
+
+            Logger.WriteLine("Recording random restart with sideways moves Hill Climbing with 8 Queens statistics...");
+            for (int i = 0; i < 500; i++)
+            {
+                results.Add(HillClimbing.RunHillClimbing(true, true, 8, false));
+            }
+
+            using (var writer = new StreamWriter($"output/results_{DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond}.csv"))
+            using (var csv = new CsvWriter(writer))
+            {
+                csv.WriteRecords<HillClimbingResult>(results);
+            }
+
+            Logger.WriteLine("All test results recorded in output directory");
         }
     }
 }
