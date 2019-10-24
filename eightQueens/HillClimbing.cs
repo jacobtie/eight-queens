@@ -17,76 +17,76 @@ namespace hill_climbing_eight_queens
 
                 var boards = ClimbHill(gameBoard, movesSideways);
 
-                Console.WriteLine("\nStarting Board Configuration: ");
-                Console.WriteLine($"Heuristic: {HillClimbing.GetHeuristicFromBoard(boards[0])}");
-                Console.Write(boards[0].GetBoardAsString());
+                Logger.WriteLine("\nStarting Board Configuration: ");
+                Logger.WriteLine($"Heuristic: {HillClimbing.GetHeuristicFromBoard(boards[0])}");
+                Logger.Write(boards[0].GetBoardAsString());
 
                 for (int i = 0; i < (boardSize * 2) + 5 || i < 21; i++)
                 {
-                    Console.Write("-");
+                    Logger.Write("-");
                 }
 
-                Console.WriteLine("\n");
+                Logger.WriteLine("\n");
 
                 for (int i = 1; i < boards.Count; i++)
                 {
                     int currH = HillClimbing.GetHeuristicFromBoard(boards[i]);
 
-                    Console.WriteLine($"Board Configuration {i+1}");
-                    Console.WriteLine($"Heuristic: {currH}");
+                    Logger.WriteLine($"Board Configuration {i+1}");
+                    Logger.WriteLine($"Heuristic: {currH}");
 
                     if (currH == HillClimbing.GetHeuristicFromBoard(boards[i-1]))
                     {
-                        Console.WriteLine("Moved Sideways. ");
+                        Logger.WriteLine("Moved Sideways. ");
                     }
 
-                    Console.Write(boards[i].GetBoardAsString());
+                    Logger.Write(boards[i].GetBoardAsString());
 
                     for (int k = 0; k < (boardSize * 2) + 5 || k < 21; k++)
                     {
-                        Console.Write("-");
+                        Logger.Write("-");
                     }
 
-                    Console.WriteLine("\n");
+                    Logger.WriteLine("\n");
                 }
 
                 if (boards.Last().GoalState)
                 {
                     retry = false;
 
-                    Console.WriteLine($"Success! This iteration took {boards.Count-1} moves. ");
+                    Logger.WriteLine($"Success! This iteration took {boards.Count-1} moves. ");
 
                     if (doesRestart)
                     {
-                        Console.Write($"Restarted {restarts} time");
+                        Logger.Write($"Restarted {restarts} time");
 
                         if (restarts != 1)
                         {
-                            Console.WriteLine("s.");
+                            Logger.WriteLine("s.");
                         }
                         else
                         {
-                            Console.WriteLine(".");
+                            Logger.WriteLine(".");
                         }
                     }
                     else
                     {
-                        Console.WriteLine();
+                        Logger.WriteLine();
                     }
                 }
                 else
                 {
                     retry = true;
                     restarts++;
-                    Console.WriteLine($"Failed. This iteration took {boards.Count-1} moves");
+                    Logger.WriteLine($"Failed. This iteration took {boards.Count-1} moves");
 
                     if (doesRestart)
                     {
-                        Console.WriteLine("Restarting now.");
+                        Logger.WriteLine("Restarting now.");
                     }
                     else
                     {
-                        Console.WriteLine();
+                        Logger.WriteLine();
                     }
                 }
             } 
