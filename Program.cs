@@ -29,27 +29,30 @@ namespace hill_climbing_eight_queens
 
                 do
                 {
-                    Console.WriteLine("\nWould you like to run the program again? (Y/N)");
+                    Logger.WriteLine("\nWould you like to run the program again? (Y/N)");
                     input = Console.ReadLine().ToUpper()[0];
+                    Logger.WriteLine(input, false);
                 }
                 while(input != 'Y' && input != 'N');
             }
             while(input == 'Y');
 
-            Console.WriteLine("\nPress any key to exit...");
-            Console.ReadKey();
+            Logger.OutputToFile();
+            Console.WriteLine("\nPress enter to exit...");
+            Console.ReadLine();
         }
 
         static void GetUserInput()
         {
             char input;
 
-            Console.WriteLine("\nWelcome to the N-Queens Problem Solver. ");
+            Logger.WriteLine("\nWelcome to the N-Queens Problem Solver. ");
 
             do
             {
-                Console.WriteLine("\nWould you like to run the tests for the program? (Y/N)");
+                Logger.WriteLine("\nWould you like to run the tests for the program? (Y/N)");
                 input = Console.ReadLine().ToUpper()[0];
+                Logger.WriteLine(input, false);
             }
             while(input != 'Y' && input != 'N');
 
@@ -59,14 +62,16 @@ namespace hill_climbing_eight_queens
             {
                 do
                 {
-                    Console.WriteLine("\nWhat would you like the size of the board to be?");
+                    Logger.WriteLine("\nWhat would you like the size of the board to be?");
                 }
                 while(!int.TryParse(Console.ReadLine(), out boardSize));
-                
+                Logger.WriteLine(boardSize, false);
+
                 do
                 {
-                    Console.WriteLine("\nWould you like the board to restart if a solution could not be found? (Y/N)");
+                    Logger.WriteLine("\nWould you like the board to restart if a solution could not be found? (Y/N)");
                     input = Console.ReadLine().ToUpper()[0];
+                    Logger.WriteLine(input, false);
                 }
                 while(input != 'Y' && input != 'N');
 
@@ -74,8 +79,9 @@ namespace hill_climbing_eight_queens
 
                 do
                 {
-                    Console.WriteLine("\nWould you like the program to explore equal states? (Y/N)");
+                    Logger.WriteLine("\nWould you like the program to explore equal states? (Y/N)");
                     input = Console.ReadLine().ToUpper()[0];
+                    Logger.WriteLine(input, false);
                 }
                 while(input != 'Y' && input != 'N');
 

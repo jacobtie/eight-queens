@@ -1,3 +1,7 @@
 # Eight Queens Solution by Hill Climbing
 
-This is a super simple solution to the Eight Queens problem by using Hill Climbing. I had to tutor this, despite knowing neither the problem nor the algorithm so I decided to write it myself to better understand it. I wrote this in a day so please forgive the inefficiencies (I know there are way too many for loops).
+## How to Run
+
+To run the program, make sure you have .NET Core 3.0 installed. You can run `dotnet run` to run the program. This will implicitly run `dotnet restore` and `dotnet build` before running `dotnet run`. Keep in mind that this will create `bin/` and `obj/` directories.
+
+The easiest way to run/edit/debug this application is by using Visual Studio Code. When you open the project in VSCode, it will prompt you to add required assets to the project. This will generate a `.vscode` folder with `launch.json` and `tasks.json` files that allow one to debug the program.
